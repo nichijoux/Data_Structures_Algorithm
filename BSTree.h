@@ -9,14 +9,6 @@ class BST :public Tree<T, compare>
 public:
 	//构造函数
 	BST() { Tree<T, compare>(); }
-	//BST(T Arr[], int size)
-	//{
-	//	Tree<T, compare>();
-	//	for (int i = 0; i < size; i++)
-	//	{
-	//		Insert(Arr[i]);
-	//	}
-	//}
 
 	//插入节点的函数
 	void Insert(const T& val);
@@ -73,12 +65,18 @@ void BST<T, compare>::Insert(const T& val)
 	}
 }
 
+//删除节点
 template<class T, class compare>
 void BST<T, compare>::Remove(const T& val)
 {
 	if (IsHaveVal(val) == true)
 	{
-
+		//有多种情况
+		//case 1: 要删除的节点为叶子节点
+		//case 2: 要删除的节点只有左子树/右子树
+		//case 3: 要删除的节点既有左子树又有右子树(利用前驱节点来修改)
+		
+		//摸了摸了,后面来写
 	}
 }
 
