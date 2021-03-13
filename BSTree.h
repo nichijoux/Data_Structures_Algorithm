@@ -99,7 +99,7 @@ TreeNode<T>* BST<T, compare>::DeleteNode(TreeNode<T>* node, T key)
 			srand(time(NULL));
 			int randNum = rand() % 100;
 			//为了避免一直删除前驱节点造成的不平衡影响,使用rand使得随机删除前驱或者后继
-			if (randNum & 1 == 0)
+			if ((randNum & 1) == 0)
 			{
 				TreeNode<T>* tempNode = node->left;
 				while (tempNode->right != nullptr)
