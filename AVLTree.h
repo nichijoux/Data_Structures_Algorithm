@@ -33,7 +33,7 @@ private:
 public:
 	//构造函数
 	AVL() {}
-	//析构函数
+	//析构函数(BST中已经有写好的析构了,不用再写了,否则报错)
 	~AVL() {}
 	//插入节点的函数(重写)
 	void Insert(const T& val)override;
@@ -101,7 +101,6 @@ TreeNode<T>* AVL<T, compare>::DoubleRotateWithRight(TreeNode<T>* preRoot)
 	return SingleRotateWithRight(preRoot);
 }
 
-
 //插入节点的辅助函数
 template<class T, class compare>
 TreeNode<T>* AVL<T, compare>::InsertNode(TreeNode<T>* node, const T& val)
@@ -161,23 +160,97 @@ TreeNode<T>* AVL<T, compare>::InsertNode(TreeNode<T>* node, const T& val)
 template<class T, class compare>
 TreeNode<T>* AVL<T, compare>::DeleteNode(TreeNode<T>* node, const T& val)
 {
+	//旋转操作会自行维护节点的高度
 	if (node == nullptr) { return node; }
 
 	if (node->val > val)
 	{
 		//走左边
 		node->left = DeleteNode(node->left, val);
+		//判断是否失衡,删除了左子树的一个节点,因此判断右子树是否过高
+		if (GetNodeHeight(node->right) - GetNodeHeight(node->left) > 1)
+		{
+			//右子树过高,则相当于向右子树中插入了节点
+			if (GetNodeHeight(node->right->left) > GetNodeHeight(node->right->right))
+			{
+				//相当于RL插入
+				node = DoubleRotateWithLeft(node);
+			}
+			else
+			{
+				//RR插入
+				node = SingleRotateWithLeft(node);
+			}
+		}
 	}
 	else if (node->val < val)
 	{
 		//走右边
 		node->right = DeleteNode(node->right, val);
+		//判断是否失衡,删除了右子树的一个节点,因此判断左子树是否过高
+		if (GetNodeHeight(node->left) - GetNodeHeight(node->right) > 1)
+		{
+			//左子树过高,则相当于向左子树中插入了节点
+			if (GetNodeHeight(node->left->right) > GetNodeHeight(node->left->left))
+			{
+				//相当于LR插入
+				node = DoubleRotateWithRight(node);
+			}
+			else
+			{
+				//LL插入
+				node = SingleRotateWithRight(node);
+			}
+		}
 	}
 	else
 	{
-		//找到节点了
+		//标准BST操作
+		//找到节点了,当node->val == key 时
+		//case 1: node为叶子节点,这种情况下直接将node删除即可
+		//case 2: node节点只有左子树/右子树(这种情况可以包括case 1)
+		//case 3: node节点既有左子树又有右子树(利用前驱节点来修改)
+		if (node->left == nullptr)
+		{
+			//只有右子树
+			TreeNode<T>* tempNode = node;//保存node指针
+			node = node->right;			 //直接将node换成它的子节点
+			delete tempNode;			 //释放原node节点的空间
+			this->NodeSize--;			 //节点数减小
+		}
+		else if (node->right == nullptr)
+		{
+			//只有左子树
+			TreeNode<T>* tempNode = node;//保存node指针
+			node = node->left;			 //直接将node换成它的子节点
+			delete tempNode;			 //释放原node节点的空间
+			this->NodeSize--;			 //节点数减小
+		}
+		else
+		{
+			//case 3,左右子树均存在
+			//如果node的左子树比右子树高则从左子树中选取
+			if (GetNodeHeight(node->left) > GetNodeHeight(node->right))
+			{
+				//找到前驱节点
+				TreeNode<T>* preNode = BST<T, compare>::FindMaxNode(node->left);
+				//找到前驱节点之后,交换preNode和node的值
+				node->val = preNode->val;
+				//接下来继续递归,从node的左子树出发,删除tempNode->val值的节点
+				//(此时要删除的节点一定属于case 1或case 2)
+				node->left = DeleteNode(node->left, preNode->val);
+			}
+			else
+			{
+				//找到next的后继节点
+				TreeNode<T>* nextNode = BST<T, compare>::FindMinNode(node->right);
+				//交换node和nextNode的值
+				node->val = nextNode->val;
+				node->right = DeleteNode(node->right, nextNode->val);
+			}
+		}
 	}
-
+	return node;
 }
 
 //插入节点的函数
@@ -191,5 +264,5 @@ void AVL<T, compare>::Insert(const T& val)
 template<class T, class compare>
 void AVL<T, compare>::Delete(const T& val)
 {
-
+	this->root = DeleteNode(this->root, val);
 }
