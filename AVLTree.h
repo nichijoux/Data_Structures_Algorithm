@@ -116,17 +116,17 @@ TreeNode<T>* AVL<T>::InsertNode(TreeNode<T>* node, const T& val)
 		{
 			node->left = InsertNode(node->left, val);
 			//查看是否需要旋转
-			//L插入,可能导致RL插入或者LL插入(L插入一定有node的左子树高度大于node右子树高度且需要旋转时差为2)
+			//L插入,可能导致LR插入或者LL插入(L插入一定有node的左子树高度大于node右子树高度且需要旋转时差为2)
 			if (GetNodeHeight(node->left) - GetNodeHeight(node->right) == 2)
 			{
 				//此时一定需要旋转,LL插入是左旋
-				//RL插入是
 				if (val < node->left->val)
 				{
 					node = SingleRotateWithRight(node);
 				}
 				else
 				{
+					//LR插入
 					node = DoubleRotateWithRight(node);
 				}
 			}
@@ -135,7 +135,7 @@ TreeNode<T>* AVL<T>::InsertNode(TreeNode<T>* node, const T& val)
 		{
 			node->right = InsertNode(node->right, val);
 			//查看是否需要旋转
-			//R插入,可能导致LR插入或者RR插入(R插入一定有node的右子树高度大于node左子树高度且需要旋转时差为2)
+			//R插入,可能导致RL插入或者RR插入(R插入一定有node的右子树高度大于node左子树高度且需要旋转时差为2)
 			if (GetNodeHeight(node->right) - GetNodeHeight(node->left) == 2)
 			{
 				//此时一定需要旋转,左旋！！！左旋！！！
@@ -145,6 +145,7 @@ TreeNode<T>* AVL<T>::InsertNode(TreeNode<T>* node, const T& val)
 				}
 				else
 				{
+					//RL插入
 					node = DoubleRotateWithLeft(node);
 				}
 			}

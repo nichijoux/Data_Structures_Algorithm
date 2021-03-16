@@ -9,12 +9,12 @@ struct TreeNode
 	T val;					//通用val
 	int height;				//AVL树使用
 	int color;				//红黑树使用
-	TreeNode* left;
-	TreeNode* right;
+	TreeNode<T>* left;
+	TreeNode<T>* right;
 
 	TreeNode() = default;
 	TreeNode(T x) : val(x), height(0), color(0), left(nullptr), right(nullptr) {}
-	TreeNode(T x, TreeNode* left, TreeNode* right) : val(x), height(0), color(0), left(left), right(right) {}
+	TreeNode(T x, TreeNode<T>* left, TreeNode<T>* right) : val(x), height(0), color(0), left(left), right(right) {}
 };
 
 template<class T>
@@ -34,7 +34,15 @@ protected:
 public:
 	//构造函数
 	Tree() { root = nullptr; NodeSize = 0; }
-	virtual ~Tree() = default;
+	virtual ~Tree() = 0;
+
+	//插入函数接口
+	virtual void Insert(const T& val) = 0;
+	//删除函数接口
+	virtual void Delete(const T& val) = 0;
+	//搜索函数接口
+	virtual bool Search(const T& val) = 0;
+
 	//前序遍历
 	void preOrder(void(*function)(TreeNode<T>* node)) { preOrderHelp(root, function); };
 	//中序遍历
